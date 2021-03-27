@@ -1,0 +1,64 @@
+name: release-actions
+on:
+  create:
+    tags:
+      - v*
+jobs:
+    package:
+      # The type of runner that the job will run on
+      strategy:
+        matrix:
+          os: [macos-latest, ubuntu-latest, windows-latest]
+          include:
+          - os: macos-latest
+            TARGET: mac
+          - os: ubuntu-latest
+            TARGET: linux
+          - os: windows-latest
+            TARGET: win
+      runs-on: ${{ matrix.os }}
+  
+      # Steps represent a sequence of tasks that will be executed as part of the job
+      steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+      # Setup Go
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.14.0' # The Go version to download (if necessary) and use.
+          
+      # Run build of the application
+      - name: build
+        run: go build -ldflags="-X 'main.Version=${{ steps.get_version.outputs.VERSION }}'" .
+      - name: test version
+        run: ./smoketester -version
+      - name: package-linux-mac
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+        run: tar -czvf smoketester-${{ matrix.TARGET }}.tar.gz smoketester
+      - name: package-win
+        if: matrix.os == 'windows-latest'
+        run: tar -czvf smoketester-${{ matrix.TARGET }}.tar.gz smoketester.exe
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: smoketester-${{ matrix.TARGET }}.tar.gz
+          path: smoketester-${{ matrix.TARGET }}.tar.gz
+    release:
+      needs: package
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v2
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+      - name: Download all artifacts
+        uses: actions/download-artifact@v2
+      - name: Upload
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          hub release create $(find . -type f -name "*.tar.gz" -printf "-a %p ") -m "${{ steps.get_version.outputs.VERSION }}" ${{ steps.get_version.outputs.VERSION }}

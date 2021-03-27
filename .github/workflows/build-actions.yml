@@ -1,0 +1,39 @@
+name: build-actions
+on: [push]
+jobs:
+    # The "build" workflow
+    build:
+      # The type of runner that the job will run on
+      strategy:
+        matrix:
+          os: [macos-latest, ubuntu-latest, windows-latest]
+          include:
+          - os: macos-latest
+            TARGET: mac
+          - os: ubuntu-latest
+            TARGET: linux
+          - os: windows-latest
+            TARGET: win
+      runs-on: ${{ matrix.os }}
+      # Steps represent a sequence of tasks that will be executed as part of the job
+      steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      # Setup Go
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.14.0' # The Go version to download (if necessary) and use.
+          
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::$(git rev-parse --short HEAD)
+      # Run build of the application
+      - name: build
+        run: go build -ldflags="-X 'main.Version=${{ steps.get_version.outputs.VERSION }}'" .
+      - name: test version
+        run: ./smoketester -version
+
+      
+
