@@ -6,16 +6,17 @@ Tool to execute smoke tests.
 
 Current Features
 ------------
-1. Multiple targets/enpoints can be tested
+1. Multiple targets/endpoints can be tested
 2. Configurable retry option in case of test failure
 3. Configurable Qualitygate
+4. only GET method is supported
 
 
 Usage
 -----
  step 1. download smoketester from <a href=https://github.com/smutil/smoketester/releases>releases</a>. 
  
- step 2. create [config.yml](https://github.com/smutil/smoketester/config.yml). If config.yaml and smoketester is not in same location, you can provide the config.yml path using --config
+ step 2. create [config.yml](https://github.com/smutil/smoketester/blob/main/config.yml). If config.yaml and smoketester is not in same location, you can provide the config.yml path using --config
  
  step 3. execute the smoketester as shown below. 
  
