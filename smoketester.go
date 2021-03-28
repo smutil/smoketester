@@ -24,6 +24,7 @@ type Global struct {
 	Retry         int `yaml:"retry"`
 	RetryInterval int `yaml:"retryInterval"`
 	StatusCode    int `yaml:"statusCode"`
+	Qualitygate   int `yaml:"qualitygate"`
 }
 
 type Target struct {
@@ -43,6 +44,7 @@ type TestResult struct {
 
 var TestResults []TestResult
 var Version = "develop"
+
 func main() {
 	var configPath string
 	var version bool
@@ -88,7 +90,26 @@ func executeTests(config Config) {
 		}
 	}
 
-	log.Println(TestResults)
+	//log.Println(TestResults)
+	if config.Global.Qualitygate != 0 {
+		qualitygate(config, TestResults)
+	}
+}
+
+func qualitygate(config Config, TestResults []TestResult) {
+	var executedTests = len(TestResults)
+	var successTests int
+	for _, r := range TestResults {
+		if r.Result == "Success" {
+			successTests = successTests + 1
+		}
+	}
+	log.Println("executedTests : " + strconv.Itoa(executedTests) + ", success : " + strconv.Itoa(successTests) + ", qualitygate threshold : " + strconv.Itoa(config.Global.Qualitygate) + "%")
+	if ((float64(successTests) / float64(executedTests)) * 100) < float64(config.Global.Qualitygate) {
+		log.Println("quality gate failed")
+		os.Exit(1)
+	}
+
 }
 
 func executeGetRequest(t Target) {

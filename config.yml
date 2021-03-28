@@ -2,14 +2,14 @@ global:
   retry: 2
   retryInterval: 2
   statusCode : 200
-  qualitygate : 100
+  qualitygate : 51
 targets:
   - url: http://localhost:3000/health
     name : healthcheck
     method : GET
     statusCode : 200
     responseText : healthy
-    retry: 3
+    retry: 1
     retryInterval: 2
   - url: https://www.indiatoday.in/rss/home
     name : indiatoday check
