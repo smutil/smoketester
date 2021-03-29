@@ -31,7 +31,7 @@ type Target struct {
 	URL           string `yaml:"url"`
 	Name          string `yaml:"name"`
 	Method        string `yaml:"method"`
-	ResponseText  string `yaml:"responseText"`
+	ResponseText  []string `yaml:"responseText"`
 	StatusCode    int    `yaml:"statusCode"`
 	Retry         int    `yaml:"retry"`
 	RetryInterval int    `yaml:"retryInterval"`
@@ -132,16 +132,21 @@ func executeGetRequest(t Target) {
 				isSuccess = false
 			}
 		}
-		if isSuccess && t.ResponseText != "" {
+		if isSuccess && len(t.ResponseText) > 0 {
 			log.Println("checking response text")
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
 				log.Printf("\x1b[31;1m%s\x1b[0m\n", fmt.Sprintf("error: %s", err))
 				isSuccess = false
-			} else if !strings.Contains(string(body), t.ResponseText) {
-				log.Println("responseText check failed")
-				isSuccess = false
+			} else {
+				for _, text := range t.ResponseText {
+					if !strings.Contains(string(body), text) {
+						log.Println("responseText check failed for text : " + text)
+						isSuccess = false
+						break
+					}
+				}
 			}
 		}
 		if isSuccess == false && t.Retry > 0 && t.RetryInterval > 0 && i < t.Retry {

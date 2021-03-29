@@ -8,11 +8,11 @@ targets:
     name : healthcheck
     method : GET
     statusCode : 200
-    responseText : healthy
+    responseText : [ "healthy" ]
     retry: 1
     retryInterval: 2
   - url: https://www.indiatoday.in/rss/home
     name : indiatoday check
     method : GET
-    responseText : India
+    responseText : [ "India", "Pune" ]
 
