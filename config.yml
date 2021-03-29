@@ -13,6 +13,6 @@ targets:
     retryInterval: 2
   - url: https://www.indiatoday.in/rss/home
     name : indiatoday check
-    method : GET
+    method : POST
     responseText : [ "India", "Pune" ]
 

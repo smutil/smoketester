@@ -9,7 +9,8 @@ Current Features
 1. Multiple targets/endpoints can be tested
 2. Configurable retry option in case of test failure
 3. Configurable Qualitygate
-4. only GET method is supported
+4. Option to provide multiple texts in response for matching
+5. GET and POST both method are supported
 
 
 Usage
@@ -27,4 +28,4 @@ Usage
 Upcoming Features
 ------------
 1. ssl configuration
-2. Post method support
+2. PostForm method support

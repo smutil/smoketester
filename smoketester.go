@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"gopkg.in/yaml.v2"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,8 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
@@ -28,13 +29,15 @@ type Global struct {
 }
 
 type Target struct {
-	URL           string `yaml:"url"`
-	Name          string `yaml:"name"`
-	Method        string `yaml:"method"`
+	URL           string   `yaml:"url"`
+	Name          string   `yaml:"name"`
+	Method        string   `yaml:"method"`
 	ResponseText  []string `yaml:"responseText"`
-	StatusCode    int    `yaml:"statusCode"`
-	Retry         int    `yaml:"retry"`
-	RetryInterval int    `yaml:"retryInterval"`
+	StatusCode    int      `yaml:"statusCode"`
+	Retry         int      `yaml:"retry"`
+	RetryInterval int      `yaml:"retryInterval"`
+	ContentType   string   `yaml:"contentType"`
+	DataPath      string   `yaml:"data"`
 }
 
 type TestResult struct {
@@ -82,8 +85,8 @@ func executeTests(config Config) {
 			t.StatusCode = config.Global.StatusCode
 		}
 		log.Println("Executing Test : " + t.Name)
-		if t.Method == "GET" {
-			executeGetRequest(t)
+		if t.Method == "GET" || t.Method == "POST"  {
+			executeRequest(t)
 		} else {
 			log.Println("method name must be GET or POST")
 			updateTestResult(t.Name, "Failed")
@@ -112,12 +115,26 @@ func qualitygate(config Config, TestResults []TestResult) {
 
 }
 
-func executeGetRequest(t Target) {
+func executeRequest(t Target) {
 
 	var isSuccess bool = true
 	for i := 0; i <= t.Retry; i++ {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-		resp, err := http.Get(t.URL)
+
+		var reqData io.Reader = nil
+		if t.DataPath != "" {
+			reqbyte, _ := ioutil.ReadFile(t.DataPath)
+			reqData = bytes.NewBuffer(reqbyte)
+		}
+
+		req, err := http.NewRequest(t.Method, t.URL, reqData)
+		if t.ContentType != "" {
+			req.Header.Set("Content-Type", t.ContentType)
+		}
+
+		client := &http.Client{}
+		resp, err := client.Do(req)
+
 		if err != nil {
 			log.Printf("\x1b[31;1m%s\x1b[0m\n", fmt.Sprintf("error: %s", err))
 			isSuccess = false
