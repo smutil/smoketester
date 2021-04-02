@@ -11,6 +11,7 @@ Current Features
 3. Configurable Qualitygate
 4. Option to provide multiple texts in response for matching
 5. GET and POST both method are supported
+6. Basic authentication supported
 
 
 Usage
