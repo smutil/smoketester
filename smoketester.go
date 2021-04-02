@@ -38,6 +38,8 @@ type Target struct {
 	RetryInterval int      `yaml:"retryInterval"`
 	ContentType   string   `yaml:"contentType"`
 	DataPath      string   `yaml:"data"`
+	Username      string   `yaml:"username"`
+	Password      string   `yaml:"password"`
 }
 
 type TestResult struct {
@@ -85,7 +87,7 @@ func executeTests(config Config) {
 			t.StatusCode = config.Global.StatusCode
 		}
 		log.Println("Executing Test : " + t.Name)
-		if t.Method == "GET" || t.Method == "POST"  {
+		if t.Method == "GET" || t.Method == "POST" {
 			executeRequest(t)
 		} else {
 			log.Println("method name must be GET or POST")
@@ -130,6 +132,10 @@ func executeRequest(t Target) {
 		req, err := http.NewRequest(t.Method, t.URL, reqData)
 		if t.ContentType != "" {
 			req.Header.Set("Content-Type", t.ContentType)
+		}
+
+		if t.Username != "" && t.Password != "" {
+			req.SetBasicAuth(t.Username, t.Password)
 		}
 
 		client := &http.Client{}

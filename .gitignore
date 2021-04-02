@@ -6,6 +6,7 @@
 *.dylib
 smoketester
 .DS_Store
+input.json
 
 # Test binary, built with `go test -c`
 *.test

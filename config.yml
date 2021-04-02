@@ -2,7 +2,7 @@ global:
   retry: 2
   retryInterval: 2
   statusCode : 200
-  qualitygate : 51
+  qualitygate : 75
 targets:
   - url: http://localhost:3000/health
     name : healthcheck
@@ -13,6 +13,19 @@ targets:
     retryInterval: 2
   - url: https://www.indiatoday.in/rss/home
     name : indiatoday check
+    method : GET
+    responseText : [ "India", "Latest" ]
+  - url: http://localhost:8080/user
+    name : update user
     method : POST
-    responseText : [ "India", "Pune" ]
-
+    username : admin
+    password : admin
+    contentType : "application/json"
+    data : "input.json"
+    responseText : [ "admin" ]
+  - url: http://localhost:8080/user
+    name : get user
+    username : admin
+    password : admin
+    method : GET
+    responseText : [ "admin" ]
