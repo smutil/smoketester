@@ -20,7 +20,7 @@ targets:
     method : POST
     username : admin
     password : admin
-    contentType : "application/json"
+    header : ["Content-Type application/json"]
     data : "input.json"
     responseText : [ "admin" ]
   - url: http://localhost:8080/user
@@ -28,4 +28,4 @@ targets:
     username : admin
     password : admin
     method : GET
-    responseText : [ "admin" ]
+    responseText : [ "adminx" ]

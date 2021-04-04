@@ -36,7 +36,7 @@ type Target struct {
 	StatusCode    int      `yaml:"statusCode"`
 	Retry         int      `yaml:"retry"`
 	RetryInterval int      `yaml:"retryInterval"`
-	ContentType   string   `yaml:"contentType"`
+	Header        []string `yaml:"header"`
 	DataPath      string   `yaml:"data"`
 	Username      string   `yaml:"username"`
 	Password      string   `yaml:"password"`
@@ -130,8 +130,10 @@ func executeRequest(t Target) {
 		}
 
 		req, err := http.NewRequest(t.Method, t.URL, reqData)
-		if t.ContentType != "" {
-			req.Header.Set("Content-Type", t.ContentType)
+		if len(t.Header) > 0 {
+			for _, header := range t.Header {
+				req.Header.Set(strings.Split(header, " ")[0], strings.Split(header, " ")[1])
+			}
 		}
 
 		if t.Username != "" && t.Password != "" {
