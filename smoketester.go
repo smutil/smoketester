@@ -87,7 +87,7 @@ func executeTests(config Config) {
 			t.StatusCode = config.Global.StatusCode
 		}
 		log.Println("Executing Test : " + t.Name)
-		if t.Method == "GET" || t.Method == "POST" {
+		if t.Method == "GET" || t.Method == "POST" || t.Method == "PUT" {
 			executeRequest(t)
 		} else {
 			log.Println("method name must be GET or POST")
