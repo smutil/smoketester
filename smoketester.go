@@ -50,6 +50,8 @@ type TestResult struct {
 var TestResults []TestResult
 var Version = "develop"
 
+const LogFormat = "\x1b[31;1m%s\x1b[0m\n"
+
 func main() {
 	var configPath string
 	var version bool
@@ -144,7 +146,7 @@ func executeRequest(t Target) {
 		resp, err := client.Do(req)
 
 		if err != nil {
-			log.Printf("\x1b[31;1m%s\x1b[0m\n", fmt.Sprintf("error: %s", err))
+			log.Printf(LogFormat, fmt.Sprintf("error: %s", err))
 			isSuccess = false
 		} else {
 			log.Println("HTTP Response Status:", resp.StatusCode, http.StatusText(resp.StatusCode))
@@ -162,7 +164,7 @@ func executeRequest(t Target) {
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
-				log.Printf("\x1b[31;1m%s\x1b[0m\n", fmt.Sprintf("error: %s", err))
+				log.Printf(LogFormat, fmt.Sprintf("error: %s", err))
 				isSuccess = false
 			} else {
 				for _, text := range t.ResponseText {
@@ -197,7 +199,7 @@ func updateTestResult(testName string, result string) {
 
 func updateStatusAndExit(err error, testname string) {
 	if err != nil {
-		log.Printf("\x1b[31;1m%s\x1b[0m\n", fmt.Sprintf("error: %s", err))
+		log.Printf(LogFormat, fmt.Sprintf("error: %s", err))
 		updateTestResult(testname, "Failed")
 		return
 	}
@@ -234,5 +236,5 @@ func ReadYML(configPath string, configPointer interface{}) error {
 }
 
 func Info(format string, args ...interface{}) {
-	fmt.Printf("\x1b[34;1m%s\x1b[0m\n", fmt.Sprintf(format, args...))
+	fmt.Printf(LogFormat, fmt.Sprintf(format, args...))
 }
