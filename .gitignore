@@ -7,6 +7,7 @@
 smoketester
 .DS_Store
 input.json
+localhost*
 
 # Test binary, built with `go test -c`
 *.test

@@ -25,8 +25,3 @@ Usage
  ```
  ./smoketester --config /path-to-config.yml
  ```
-
-Upcoming Features
-------------
-1. ssl configuration
-2. PostForm method support

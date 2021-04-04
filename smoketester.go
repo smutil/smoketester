@@ -22,10 +22,12 @@ type Config struct {
 }
 
 type Global struct {
-	Retry         int `yaml:"retry"`
-	RetryInterval int `yaml:"retryInterval"`
-	StatusCode    int `yaml:"statusCode"`
-	Qualitygate   int `yaml:"qualitygate"`
+	Retry         int    `yaml:"retry"`
+	RetryInterval int    `yaml:"retryInterval"`
+	StatusCode    int    `yaml:"statusCode"`
+	Qualitygate   int    `yaml:"qualitygate"`
+	SslCert       string `yaml:"sslCert"`
+	SslKey        string `yaml:"sslKey"`
 }
 
 type Target struct {
@@ -40,6 +42,8 @@ type Target struct {
 	DataPath      string   `yaml:"data"`
 	Username      string   `yaml:"username"`
 	Password      string   `yaml:"password"`
+	SslCert       string   `yaml:"sslCert"`
+	SslKey        string   `yaml:"sslKey"`
 }
 
 type TestResult struct {
@@ -88,6 +92,12 @@ func executeTests(config Config) {
 		if t.StatusCode == 0 {
 			t.StatusCode = config.Global.StatusCode
 		}
+		if t.SslCert == "" {
+			t.SslCert = config.Global.SslCert
+		}
+		if t.SslKey == "" {
+			t.SslKey = config.Global.SslKey
+		}
 		log.Println("Executing Test : " + t.Name)
 		if t.Method == "GET" || t.Method == "POST" || t.Method == "PUT" {
 			executeRequest(t)
@@ -123,7 +133,12 @@ func executeRequest(t Target) {
 
 	var isSuccess bool = true
 	for i := 0; i <= t.Retry; i++ {
-		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		if t.SslCert == "" && t.SslKey == "" {
+			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		} else {
+			cert, _ := tls.LoadX509KeyPair(t.SslCert, t.SslKey)
+			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{Certificates: []tls.Certificate{cert}}
+		}
 
 		var reqData io.Reader = nil
 		if t.DataPath != "" {
