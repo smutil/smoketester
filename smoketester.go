@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"regexp"
 )
 
 type Config struct {
@@ -247,9 +248,27 @@ func ReadYML(configPath string, configPointer interface{}) error {
 		return err
 	}
 
+	b, err := yaml.Marshal(configPointer)
+	yaml.Unmarshal(replaceEnvInConfig(b), configPointer)
+
 	return nil
 }
 
 func Info(format string, args ...interface{}) {
 	fmt.Printf(LogFormat, fmt.Sprintf(format, args...))
+}
+
+func replaceEnvInConfig(body []byte) []byte {
+    search := regexp.MustCompile(`\$\{([^{}]+)\}`)
+    replacedBody := search.ReplaceAllFunc(body, func(b []byte) []byte {
+        group1 := search.ReplaceAllString(string(b), `$1`)
+
+        envValue := os.Getenv(group1)
+        if len(envValue) > 0 {
+            return []byte(envValue)
+        }
+        return []byte("")
+    })
+
+    return replacedBody
 }

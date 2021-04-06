@@ -10,8 +10,9 @@ Current Features
 2. Configurable retry option in case of test failure
 3. Configurable Qualitygate
 4. Option to provide multiple texts in response for matching
-5. GET and POST both method are supported
+5. GET, POST and PUT methods are supported
 6. Basic authentication supported
+7. Environment variables can be defined as ${ENVNAME}
 
 
 Usage
