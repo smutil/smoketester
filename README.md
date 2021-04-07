@@ -2,7 +2,7 @@
 
 ![example workflow](https://github.com/smutil/smoketester/actions/workflows/build-actions.yml/badge.svg)![example workflow](https://github.com/smutil/smoketester/actions/workflows/release-actions.yml/badge.svg)
 
-Tool to execute smoke tests. 
+Tool to execute smoke tests. smoketester can be used in CI/CD pipeline for smoketesting after deployment to test api response and application health check.
 
 Current Features
 ------------
@@ -26,3 +26,27 @@ Usage
  ```
  ./smoketester --config /path-to-config.yml
  ```
+
+Configuration
+-----
+
+ ```
+global:
+  [ retry: <retry count , can be overwritten for each test > | type:int ]
+  [ retryInterval: <retry interval in seconds, can be overwritten for each test> | type:int ]
+  [ statusCode: <http return status code, can be overwritten for each test> | type: int ]
+  [ qualitygate: <percentage of success tests as qualitygate> | type: int ]
+targets:  <list of targets for testing>
+  - [ url: < http/https target endpoint > | type:string ]
+    [ name : < testname > | type:string ]
+    [ method : < GET/POST/PUT > | type:string ]
+    [ username : < username, needed for basic authentication > | type:string ]
+    [ password : < password, needed for basic authentication > | type:string ]
+    [ header : < ["Content-Type application/json", "Accept application/json" ,.....]  | type: array of string]
+    [ data : < input datafile path for POST/PUT request > | type:string ]
+    [ responseText : < ["healthy", "UP" ,.....]  | type: array of string]
+    [ retry: <retry count > | type:int ]
+    [ retryInterval: <retry interval in seconds> | type:int ]
+    [ statusCode: <http return status code> | type: int ]
+  
+   ```
