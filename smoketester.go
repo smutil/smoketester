@@ -195,6 +195,7 @@ func executeRequest(t Target) {
 		if isSuccess == false && t.Retry > 0 && t.RetryInterval > 0 && i < t.Retry {
 			log.Println("will retry after " + strconv.Itoa(t.RetryInterval) + " seconds")
 			time.Sleep(time.Second * time.Duration(t.RetryInterval))
+			isSuccess = true // reset isSuccess for next interation
 		} else {
 			break
 		}
