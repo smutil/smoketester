@@ -26,6 +26,11 @@ Usage
  ```
  ./smoketester --config /path-to-config.yml
  ```
+ step 4. use --verbose to see detailed log
+ 
+ ```
+ ./smoketester --config /path-to-config.yml --verbose
+ ```
 
 Configuration
 -----
