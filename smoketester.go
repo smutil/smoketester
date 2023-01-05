@@ -56,12 +56,13 @@ var TestResults []TestResult
 var Version = "develop"
 
 const LogFormat = "\x1b[31;1m%s\x1b[0m\n"
-
+var verboseMode bool
 func main() {
 	var configPath string
 	var version bool
 	flag.StringVar(&configPath, "config", "./config.yml", "path to config file")
 	flag.BoolVar(&version, "version", false, "returns the fileuploader version")
+	flag.BoolVar(&verboseMode, "verbose", false, "additional details will be logged")
 	flag.Parse()
 	if version {
 		fmt.Println(Version)
@@ -170,6 +171,9 @@ func executeRequest(t Target) {
 
 		if isSuccess && t.StatusCode != 0 {
 			log.Println("checking https status code")
+			if verboseMode {
+				log.Printf("status code is %d", t.StatusCode)
+			}
 			if t.StatusCode != resp.StatusCode {
 				log.Println("statusCode check failed")
 				isSuccess = false
@@ -184,6 +188,9 @@ func executeRequest(t Target) {
 				isSuccess = false
 			} else {
 				for _, text := range t.ResponseText {
+					if verboseMode {
+						log.Printf("response is %s", string(body))
+					}
 					if !strings.Contains(string(body), text) {
 						log.Println("responseText check failed for text : " + text)
 						isSuccess = false
